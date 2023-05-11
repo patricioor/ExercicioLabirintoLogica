@@ -134,58 +134,81 @@ namespace Atividade
             List<string> resultado = new List<string>();
             resultado.Add("O [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
 
-
             // Percorre a matriz (labirinto) até encontrar a saída, usando as regras de prioridade e posições não visitadas, e vai armazenando o trajeto na list resultado
             bool achouSaida = lAtual == lSaida && cAtual == cSaida;
 
-            //Instancia um objeto "regex" para, em conjunto com o MatchCollection, possibilitar o uso do método "Matches()"
+            //Instancia um objeto "regex" com o parâmentro "@"\d+" receberá apenas os números que forem a ele destinado.
+            //O uso do regex tbm é para possibilitar o uso do tipo MatchCollection, e ter acesso ao método "Matches()"
             Regex regex = new Regex(@"\d+");
+
+            //Variável que irá contar os loops que serão incrementados caso as coordenadas não viabilizem nenhuma rota.
+            var contadorDeLoop = 0;
 
             while (!achouSaida)
             {
-                foreach (var item in resultado)
+                for (var x = 0; x < resultado.Count; x++)
                 {
-                    MatchCollection matches = regex.Matches(item);
-                    lAtual = int.Parse(matches[0].Value) - 1;
-                    cAtual = int.Parse(matches[1].Value) - 1;
+                    //Matches recebe elemento contido no resultado com base no tamanho da lista(resultado.Count) e decrementando "1" para adequar ao índice máximo da lista.
+                    //Em conjunto é decrementando o valor contido em "contadorDoLoop" para retornar alguns elementos e procurar novas alternativas de rota.
+                    MatchCollection matches = regex.Matches(resultado[(resultado.Count - 1 < 0? 0: resultado.Count -1) - contadorDeLoop]);
+                    // matches é utilizado para pegar o elemento,
+                    lAtual = int.Parse(matches[0].Value);
+                    cAtual = int.Parse(matches[1].Value);
 
-                    // Check for base cases:
-                    // 1. We have run into an obstacle, return false
-                    if (matriz[lAtual, cAtual] == "1")
+                    Console.WriteLine($"({lAtual}, {cAtual})");
+
+                    // Achou a saída?
+                    if (lAtual == lSaida && cAtual == cSaida)
                     {
-                        continue;
+                        achouSaida = true;
+                        break;
                     }
 
-                    // 2. We have found a square that has already been explored
-                    if (resultado.Contains("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
+                    //Pode subir?
+                    bool podeSubir =  matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0";
+                    Console.WriteLine(podeSubir);
+
+                    //Pode ir para esquerda?
+                    bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0";
+                    Console.WriteLine(podeEsquerda);
+
+                    //Pode ir para direita?
+                    bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0";
+                    Console.WriteLine(podeDireita);
+                    //Pode descer?
+                    bool podeDescer = matriz[lAtual, cAtual + 1 > extremidadeLinha? extremidadeLinha : cAtual +1] == "0";
+                    Console.WriteLine(podeDescer);
+
+                    // Condição só permite a entrada se além da condição do "podeSubir","podeEsquerda", "podeDireita" e "podeDescer" ser atendida,
+                    // não pode ter registrado o mesmo ponto na mesma direção.
+                    // Caso alguma condição seja atendida, será zerado o contadorDeLoop.
+                    if (podeSubir && !resultado.Contains("C [" + (lAtual - 1) + ", " + (cAtual) + "]"))
                     {
-                        continue;
-
+                        resultado.Add("C [" + (lAtual - 1) + ", " + (cAtual) + "]");
+                        contadorDeLoop = 0;
                     }
-
-                    // Otherwise, use logical short circuiting to try each
-                    // direction in turn (if needed)
-                    bool found = (matriz[lAtual - 1, cAtual] == "0" ||
-                                 matriz[lAtual + 1, cAtual] == "0" ||
-                                 matriz[lAtual, cAtual + 1] == "0" ||
-                                 matriz[lAtual, cAtual - 1] == "0");
-
-                    if (found)
+                    else if (podeEsquerda && !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]"))
                     {
-                        resultado.Add("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
+                        resultado.Add("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
+                        contadorDeLoop = 0;
                     }
+                    else if (podeDireita && !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]"))
+                    {
+                        resultado.Add("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                        contadorDeLoop = 0;
+                    }
+                    else if (podeDescer && !resultado.Contains("D [" + (lAtual + 1) + ", " + (cAtual) + "]"))
+                    {
+                        resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
+                        contadorDeLoop = 0;
+                    }
+                    //Caso não seja encontrada nenhuma combinação, o contador será incrementado.
                     else
                     {
-                        var coordenada = resultado.IndexOf("[" + (lAtual) + ", " + (cAtual) + "]").ToString();
-                        resultado.Remove(coordenada);
-                    }
+                        contadorDeLoop++;
+                    }                    
                 }
-
-                // Achou a saída?
-                achouSaida = lAtual == lSaida && cAtual == cSaida;
-
             }
-
             // Salva arquivo texto de saída com o trajeto
             string folderPath = Path.GetDirectoryName(filePath);
             string fileName = Path.GetFileNameWithoutExtension(filePath);
