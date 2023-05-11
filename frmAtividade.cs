@@ -134,7 +134,7 @@ namespace Atividade
             List<string> resultado = new List<string>();
             resultado.Add("O [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
 
-            
+
 
             //// Acessando os dados
             //(int, int) valores = dados["Exemplo"];
@@ -155,15 +155,14 @@ namespace Atividade
 
             while (!achouSaida)
             {
-                for (var x = 0; x < resultado.Count; x++)
-                {
-                    //Matches recebe elemento contido no resultado com base no tamanho da lista(resultado.Count) e decrementando "1" para adequar ao índice máximo da lista.
-                    //Em conjunto é decrementando o valor contido em "contadorDoLoop" para retornar alguns elementos e procurar novas alternativas de rota.
-                    MatchCollection matches = regex.Matches(resultado[(resultado.Count - 1 < 0? 0: resultado.Count -1) - contadorDeLoop]);
 
-                    // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
-                    lAtual = int.Parse(matches[0].Value);
-                    cAtual = int.Parse(matches[1].Value);
+                //Matches recebe elemento contido no resultado com base no tamanho da lista(resultado.Count) e decrementando "1" para adequar ao índice máximo da lista.
+                //Em conjunto é decrementando o valor contido em "contadorDoLoop" para retornar alguns elementos e procurar novas alternativas de rota.
+                MatchCollection matches = regex.Matches(resultado[(resultado.Count - 1 < 0 ? 0 : resultado.Count - 1) - contadorDeLoop]);
+
+                // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
+                lAtual = int.Parse(matches[0].Value);
+                cAtual = int.Parse(matches[1].Value);
 
                     // Achou a saída?
                     if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
@@ -172,51 +171,50 @@ namespace Atividade
                         break;
                     }
 
-                    //Pode subir? Se sim, o elemento já existe na lista?
-                    bool podeSubir =  matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
+                //Pode subir? Se sim, o elemento já existe na lista?
+                bool podeSubir = matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
                                       !resultado.Contains("C [" + (lAtual - 1 > 0 ? lAtual - 1 : 0) + ", " + (cAtual) + "]");
 
-                    //Pode ir para esquerda? Se sim, o elemento já existe na lista?
-                    bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0" &&
-                                        !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
+                //Pode ir para esquerda? Se sim, o elemento já existe na lista?
+                bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0" &&
+                                    !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
 
-                    //Pode ir para direita? Se sim, o elemento já existe na lista?
-                    bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0" && 
-                                       !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                //Pode ir para direita? Se sim, o elemento já existe na lista?
+                bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0" &&
+                                   !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
 
-                    //Pode descer? Se sim, o elemento já existe na lista?
-                    bool podeDescer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
-                                      !resultado.Contains("B [" + (lAtual+1) + ", " + (cAtual) + "]");
+                //Pode descer? Se sim, o elemento já existe na lista?
+                bool podeDescer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
+                                  !resultado.Contains("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
 
 
-                    // Condição só permite a entrada se além da condição do "podeSubir","podeEsquerda", "podeDireita" e "podeDescer" ser atendida,
-                    // não pode ter registrado o mesmo ponto na mesma direção.
-                    // Caso alguma condição seja atendida, será zerado o contadorDeLoop.
-                    if (podeSubir)
-                    {
-                        resultado.Add("C [" + (lAtual - 1 ) + ", " + (cAtual) + "]");
-                        contadorDeLoop = 0;
-                    }
-                    else if (podeEsquerda)
-                    {
-                        resultado.Add("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
-                        contadorDeLoop = 0;
-                    }
-                    else if (podeDireita)
-                    {
-                        resultado.Add("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
-                        contadorDeLoop = 0;
-                    }
-                    else if (podeDescer)
-                    {
-                        resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
-                        contadorDeLoop = 0;
-                    }
-                    //Caso não seja encontrada nenhuma combinação, o contador será incrementado.
-                    else
-                    {
-                        contadorDeLoop++;
-                    }                    
+                // Condição só permite a entrada se além da condição do "podeSubir","podeEsquerda", "podeDireita" e "podeDescer" ser atendida,
+                // não pode ter registrado o mesmo ponto na mesma direção.
+                // Caso alguma condição seja atendida, será zerado o contadorDeLoop.
+                if (podeSubir)
+                {
+                    resultado.Add("C [" + (lAtual - 1) + ", " + (cAtual) + "]");
+                    contadorDeLoop = 0;
+                }
+                else if (podeEsquerda)
+                {
+                    resultado.Add("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
+                    contadorDeLoop = 0;
+                }
+                else if (podeDireita)
+                {
+                    resultado.Add("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                    contadorDeLoop = 0;
+                }
+                else if (podeDescer)
+                {
+                    resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
+                    contadorDeLoop = 0;
+                }
+                //Caso não seja encontrada nenhuma combinação, o contador será incrementado.
+                else
+                {
+                    contadorDeLoop++;
                 }
             }
             // Salva arquivo texto de saída com o trajeto
