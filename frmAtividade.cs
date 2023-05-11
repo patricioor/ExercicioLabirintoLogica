@@ -177,20 +177,19 @@ namespace Atividade
                         break;
                     }
 
-                    //Pode subir?Elemento já existe na lista?
+                    //Pode subir? Se sim, o elemento já existe na lista?
                     bool podeSubir =  matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
                                       !resultado.Contains("C [" + (lAtual - 1 > 0 ? lAtual - 1 : 0) + ", " + (cAtual) + "]");
-                                       
-                    //Pode ir para esquerda?
+
+                    //Pode ir para esquerda? Se sim, o elemento já existe na lista?
                     bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0" &&
                                         !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
 
-                    //Pode ir para direita?
+                    //Pode ir para direita? Se sim, o elemento já existe na lista?
                     bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0" && 
                                        !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
-                    Console.WriteLine(resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]"));
 
-                    //Pode descer?
+                    //Pode descer? Se sim, o elemento já existe na lista?
                     bool podeDescer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
                                       !resultado.Contains("B [" + (lAtual+1) + ", " + (cAtual) + "]");
 
