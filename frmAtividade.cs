@@ -7,6 +7,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -133,78 +134,53 @@ namespace Atividade
             List<string> resultado = new List<string>();
             resultado.Add("O [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
 
-            var visitados = new HashSet<string>();
 
             // Percorre a matriz (labirinto) até encontrar a saída, usando as regras de prioridade e posições não visitadas, e vai armazenando o trajeto na list resultado
             bool achouSaida = lAtual == lSaida && cAtual == cSaida;
+
+            //Instancia um objeto "regex" para, em conjunto com o MatchCollection, possibilitar o uso do método "Matches()"
+            Regex regex = new Regex(@"\d+");
+
             while (!achouSaida)
             {
-                if (achouSaida = lAtual == lSaida && cAtual == cSaida) { goto Fim; }
-
-                // Cima
-                if (matriz[lAtual - 1, cAtual] == "0"
-                    && !visitados.Contains("[" + (lAtual) + ", " + (cAtual + 1) + "]"))
+                foreach (var item in resultado)
                 {
-                    lAtual--;
-                    Console.WriteLine($"({lAtual + 1},{cAtual + 1})");
-                    if (!resultado.Contains("C [" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
+                    MatchCollection matches = regex.Matches(item);
+                    lAtual = int.Parse(matches[0].Value) - 1;
+                    cAtual = int.Parse(matches[1].Value) - 1;
+
+                    // Check for base cases:
+                    // 1. We have run into an obstacle, return false
+                    if (matriz[lAtual, cAtual] == "1")
                     {
-                        resultado.Add("C [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
                         continue;
                     }
 
-                    if (!visitados.Contains("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
-                        visitados.Add("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
-                    
-                }
-                // Direita
-                else if (matriz[lAtual, cAtual + 1] == "0"
-                    && !visitados.Contains("[" + (lAtual + 1) + ", " + (cAtual + 2) + "]"))
-                {
-                    cAtual++;
-                    Console.WriteLine($"({lAtual + 1},{cAtual + 1})");
-                    if (!resultado.Contains("D [" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
+                    // 2. We have found a square that has already been explored
+                    if (resultado.Contains("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
                     {
-                        resultado.Add("D [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
                         continue;
+
                     }
 
-                    if (!visitados.Contains("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
-                        visitados.Add("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
-                }
+                    // Otherwise, use logical short circuiting to try each
+                    // direction in turn (if needed)
+                    bool found = (matriz[lAtual - 1, cAtual] == "0" ||
+                                 matriz[lAtual + 1, cAtual] == "0" ||
+                                 matriz[lAtual, cAtual + 1] == "0" ||
+                                 matriz[lAtual, cAtual - 1] == "0");
 
-                // Baixo
-                else if (matriz[lAtual + 1, cAtual] == "0" 
-                    && !visitados.Contains("[" + (lAtual + 2) + ", " + (cAtual + 1) + "]"))
-                {
-                    lAtual++;
-                    Console.WriteLine($"({lAtual + 1},{cAtual + 1})");
-                    if (!resultado.Contains("B [" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
+                    if (found)
                     {
-                        resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
-                        continue;
+                        resultado.Add("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
                     }
-
-                    if (!visitados.Contains("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
-                        visitados.Add("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
-                }
-
-                // Esquerdo
-                else if (matriz[lAtual, cAtual-1] == "0"
-                        && !visitados.Contains("[" + (lAtual + 1) + ", " + (cAtual) + "]"))
-                {
-                    cAtual--;
-                    Console.WriteLine($"({lAtual + 1},{cAtual + 1})");
-                    if (!resultado.Contains("E [" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
+                    else
                     {
-                        resultado.Add("E [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
-                        continue;
+                        var coordenada = resultado.IndexOf("[" + (lAtual) + ", " + (cAtual) + "]").ToString();
+                        resultado.Remove(coordenada);
                     }
-
-                    if (!visitados.Contains("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]"))
-                        visitados.Add("[" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
                 }
-            Fim:
+
                 // Achou a saída?
                 achouSaida = lAtual == lSaida && cAtual == cSaida;
 
