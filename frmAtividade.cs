@@ -145,7 +145,7 @@ namespace Atividade
             // Percorre a matriz (labirinto) até encontrar a saída, usando as regras de prioridade e posições não visitadas, e vai armazenando o trajeto na list resultado
             bool achouSaida = lAtual == lSaida && cAtual == cSaida;
 
-            //Instancia um objeto "regex" com o parâmentro "@"\d+" receberá apenas os números que forem a ele destinado.
+            //Instancia um objeto "regex" com a expressão regular "@"\d+" fará o regex receber apenas números.
             //O uso do regex tbm é para possibilitar o uso do tipo MatchCollection, e ter acesso ao método "Matches()"
             Regex regex = new Regex("[0-9]+");
 
@@ -157,8 +157,6 @@ namespace Atividade
             {
                 for (var x = 0; x < resultado.Count; x++)
                 {
-                    char direcao = resultado[x][0];
-
                     //Matches recebe elemento contido no resultado com base no tamanho da lista(resultado.Count) e decrementando "1" para adequar ao índice máximo da lista.
                     //Em conjunto é decrementando o valor contido em "contadorDoLoop" para retornar alguns elementos e procurar novas alternativas de rota.
                     MatchCollection matches = regex.Matches(resultado[(resultado.Count - 1 < 0? 0: resultado.Count -1) - contadorDeLoop]);
@@ -166,9 +164,6 @@ namespace Atividade
                     // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
                     lAtual = int.Parse(matches[0].Value);
                     cAtual = int.Parse(matches[1].Value);
-
-
-                    Console.WriteLine($"{direcao} ({lAtual}, {cAtual})");
 
                     // Achou a saída?
                     if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
