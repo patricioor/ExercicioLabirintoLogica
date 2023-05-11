@@ -134,12 +134,21 @@ namespace Atividade
             List<string> resultado = new List<string>();
             resultado.Add("O [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
 
+            
+
+            //// Acessando os dados
+            //(int, int) valores = dados["Exemplo"];
+            //int numero1 = valores.Item1;
+            //int numero2 = valores.Item2;
+
+
             // Percorre a matriz (labirinto) até encontrar a saída, usando as regras de prioridade e posições não visitadas, e vai armazenando o trajeto na list resultado
             bool achouSaida = lAtual == lSaida && cAtual == cSaida;
 
             //Instancia um objeto "regex" com o parâmentro "@"\d+" receberá apenas os números que forem a ele destinado.
             //O uso do regex tbm é para possibilitar o uso do tipo MatchCollection, e ter acesso ao método "Matches()"
-            Regex regex = new Regex(@"\d+");
+            Regex regex = new Regex("[0-9]+");
+
 
             //Variável que irá contar os loops que serão incrementados caso as coordenadas não viabilizem nenhuma rota.
             var contadorDeLoop = 0;
@@ -148,56 +157,63 @@ namespace Atividade
             {
                 for (var x = 0; x < resultado.Count; x++)
                 {
+                    char direcao = resultado[x][0];
+
                     //Matches recebe elemento contido no resultado com base no tamanho da lista(resultado.Count) e decrementando "1" para adequar ao índice máximo da lista.
                     //Em conjunto é decrementando o valor contido em "contadorDoLoop" para retornar alguns elementos e procurar novas alternativas de rota.
                     MatchCollection matches = regex.Matches(resultado[(resultado.Count - 1 < 0? 0: resultado.Count -1) - contadorDeLoop]);
-                    // matches é utilizado para pegar o elemento,
+
+                    // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
                     lAtual = int.Parse(matches[0].Value);
                     cAtual = int.Parse(matches[1].Value);
 
-                    Console.WriteLine($"({lAtual}, {cAtual})");
+
+                    Console.WriteLine($"{direcao} ({lAtual}, {cAtual})");
 
                     // Achou a saída?
-                    if (lAtual == lSaida && cAtual == cSaida)
+                    if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
                     {
                         achouSaida = true;
                         break;
                     }
 
-                    //Pode subir?
-                    bool podeSubir =  matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0";
-                    Console.WriteLine(podeSubir);
-
+                    //Pode subir?Elemento já existe na lista?
+                    bool podeSubir =  matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
+                                      !resultado.Contains("C [" + (lAtual - 1 > 0 ? lAtual - 1 : 0) + ", " + (cAtual) + "]");
+                                       
                     //Pode ir para esquerda?
-                    bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0";
-                    Console.WriteLine(podeEsquerda);
+                    bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0" &&
+                                        !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
 
                     //Pode ir para direita?
-                    bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0";
-                    Console.WriteLine(podeDireita);
+                    bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0" && 
+                                       !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                    Console.WriteLine(resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]"));
+
                     //Pode descer?
-                    bool podeDescer = matriz[lAtual, cAtual + 1 > extremidadeLinha? extremidadeLinha : cAtual +1] == "0";
-                    Console.WriteLine(podeDescer);
+                    bool podeDescer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
+                                      !resultado.Contains("B [" + (lAtual+1) + ", " + (cAtual) + "]");
+
 
                     // Condição só permite a entrada se além da condição do "podeSubir","podeEsquerda", "podeDireita" e "podeDescer" ser atendida,
                     // não pode ter registrado o mesmo ponto na mesma direção.
                     // Caso alguma condição seja atendida, será zerado o contadorDeLoop.
-                    if (podeSubir && !resultado.Contains("C [" + (lAtual - 1) + ", " + (cAtual) + "]"))
+                    if (podeSubir)
                     {
-                        resultado.Add("C [" + (lAtual - 1) + ", " + (cAtual) + "]");
+                        resultado.Add("C [" + (lAtual - 1 ) + ", " + (cAtual) + "]");
                         contadorDeLoop = 0;
                     }
-                    else if (podeEsquerda && !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]"))
+                    else if (podeEsquerda)
                     {
                         resultado.Add("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
                         contadorDeLoop = 0;
                     }
-                    else if (podeDireita && !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]"))
+                    else if (podeDireita)
                     {
                         resultado.Add("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
                         contadorDeLoop = 0;
                     }
-                    else if (podeDescer && !resultado.Contains("D [" + (lAtual + 1) + ", " + (cAtual) + "]"))
+                    else if (podeDescer)
                     {
                         resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
                         contadorDeLoop = 0;
