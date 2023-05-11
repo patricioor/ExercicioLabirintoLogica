@@ -155,7 +155,6 @@ namespace Atividade
 
             while (!achouSaida)
             {
-
                 //Matches recebe elemento contido no resultado com base no tamanho da lista(resultado.Count) e decrementando "1" para adequar ao índice máximo da lista.
                 //Em conjunto é decrementando o valor contido em "contadorDoLoop" para retornar alguns elementos e procurar novas alternativas de rota.
                 MatchCollection matches = regex.Matches(resultado[(resultado.Count - 1 < 0 ? 0 : resultado.Count - 1) - contadorDeLoop]);
@@ -164,12 +163,12 @@ namespace Atividade
                 lAtual = int.Parse(matches[0].Value);
                 cAtual = int.Parse(matches[1].Value);
 
-                    // Achou a saída?
-                    if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
-                    {
-                        achouSaida = true;
-                        break;
-                    }
+                // Achou a saída?
+                if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
+                {
+                    achouSaida = true;
+                    break;
+                }
 
                 //Pode subir? Se sim, o elemento já existe na lista?
                 bool podeSubir = matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
@@ -186,7 +185,6 @@ namespace Atividade
                 //Pode descer? Se sim, o elemento já existe na lista?
                 bool podeDescer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
                                   !resultado.Contains("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
-
 
                 // Condição só permite a entrada se além da condição do "podeSubir","podeEsquerda", "podeDireita" e "podeDescer" ser atendida,
                 // não pode ter registrado o mesmo ponto na mesma direção.
@@ -211,6 +209,7 @@ namespace Atividade
                     resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
                     contadorDeLoop = 0;
                 }
+
                 //Caso não seja encontrada nenhuma combinação, o contador será incrementado.
                 else
                 {
