@@ -79,9 +79,6 @@ namespace Atividade
             }
         }
 
-
-
-
         private void CodigoAtividade(string filePath)
         {
             // Lê o arquivo de entrada e o converte num array de string
@@ -155,8 +152,6 @@ namespace Atividade
                 // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
                 lAtual = int.Parse(matches[0].Value);
                 cAtual = int.Parse(matches[1].Value);
-                Console.WriteLine($"{resultado.Last().Substring(0, 1)} ({lAtual}, {cAtual})");
-                Console.WriteLine(visitado.Last());
 
                 // Achou a saída?
                 if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
