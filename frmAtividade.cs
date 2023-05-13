@@ -200,6 +200,8 @@ namespace Atividade
 
                 bool foiVisitadoBaixo = visitado.Contains($"{lAtual + 1}{cAtual}");
 
+                //Liberação da volta a uma célula já visitada caso não haja saída
+
                 if (esquerda && direita && descer)
                     foiVisitadoCima = false;
 
