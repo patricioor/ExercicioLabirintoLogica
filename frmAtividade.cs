@@ -152,6 +152,7 @@ namespace Atividade
                 // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
                 lAtual = int.Parse(matches[0].Value);
                 cAtual = int.Parse(matches[1].Value);
+                Console.WriteLine($"{resultado.Last()[0]} ({lAtual}, {cAtual})");
 
                 // Achou a saída?
                 if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
@@ -219,18 +220,22 @@ namespace Atividade
 
                 bool prioridadeBaixo = (subir ^ foiVisitadoCima) && (direita ^ foiVisitadoDireita) && (esquerda ^ foiVisitadoEsquerda);
 
+                
+
                 //Lógica final para o if
-                //Cima
                 bool podeSubir = !subir && !jaEsteveCima;
 
-                //Esquerda
                 bool podeEsquerda = !esquerda && !jaEsteveEsquerda;
 
-                //Direita
                 bool podeDireita = !direita && !jaEsteveDireita;
 
-                //Baixo
                 bool podeDescer = !descer && !jaEsteveBaixo;
+
+                //confirmação parede
+                if (prioridadeCima && !podeSubir) prioridadeCima = false;
+                if (prioridadeEsquerda && !podeEsquerda) prioridadeEsquerda = false;
+                if (prioridadeDireita && !podeDireita) prioridadeDireita = false;
+                if (prioridadeBaixo && !podeDescer) prioridadeBaixo = false;
 
                 //filtro para evitar duplicidade de coordenadas desnecessárias.
 
