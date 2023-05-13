@@ -1,4 +1,4 @@
-# ExercicioLabirintoLogica
+# Exercicio de Lógica - Labirinto Binário
 
 O código fornecido é uma implementação de um algoritmo de resolução de labirinto que percorre uma matriz e tenta encontrar a saída, 
 priorizando certas direções e não visitando células já visitadas. O algoritmo armazena o caminho percorrido em uma lista de strings chamada "resultado".
@@ -26,7 +26,7 @@ Isso garante que o algoritmo explore outras possíveis rotas antes de desistir.
 
 Finalmente, o algoritmo imprime o último elemento da lista "resultado", que deve ser a posição de saída com o indicador de direção correspondente.
 
-Exemplos de labirinto finalizados com o código:
+Exemplos de labirintos finalizados com o código:
 
 ![image](https://github.com/patricioor/ExercicioLabirintoLogica/assets/111129849/e0f636fd-9607-436c-b4cd-ff4d7307113e) ![image](https://github.com/patricioor/ExercicioLabirintoLogica/assets/111129849/5536693f-6060-4aec-805e-2387549d799e) ![image](https://github.com/patricioor/ExercicioLabirintoLogica/assets/111129849/bed1b246-3224-45d4-921d-7094d7799e99) ![image](https://github.com/patricioor/ExercicioLabirintoLogica/assets/111129849/ede4dbca-5d8c-4d5a-aaaf-657f3e82de3b)
 
