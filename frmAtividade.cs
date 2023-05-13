@@ -133,14 +133,8 @@ namespace Atividade
             // Guarda o trajeto em uma list de string e já inicia com a posição de origem
             List<string> resultado = new List<string>();
             resultado.Add("O [" + (lAtual + 1) + ", " + (cAtual + 1) + "]");
-
-
-
-            //// Acessando os dados
-            //(int, int) valores = dados["Exemplo"];
-            //int numero1 = valores.Item1;
-            //int numero2 = valores.Item2;
-
+            List<string> visitado = new List<string>();
+            visitado.Add($"{lAtual + 1}{cAtual + 1}");
 
             // Percorre a matriz (labirinto) até encontrar a saída, usando as regras de prioridade e posições não visitadas, e vai armazenando o trajeto na list resultado
             bool achouSaida = lAtual == lSaida && cAtual == cSaida;
@@ -148,7 +142,6 @@ namespace Atividade
             //Instancia um objeto "regex" com a expressão regular "@"\d+" fará o regex receber apenas números.
             //O uso do regex tbm é para possibilitar o uso do tipo MatchCollection, e ter acesso ao método "Matches()"
             Regex regex = new Regex("[0-9]+");
-
 
             //Variável que irá contar os loops que serão incrementados caso as coordenadas não viabilizem nenhuma rota.
             var contadorDeLoop = 0;
@@ -162,6 +155,8 @@ namespace Atividade
                 // matches é utilizado para pegar o elementos do tipo "int" separdos pelo regex
                 lAtual = int.Parse(matches[0].Value);
                 cAtual = int.Parse(matches[1].Value);
+                Console.WriteLine($"{resultado.Last().Substring(0, 1)} ({lAtual}, {cAtual})");
+                Console.WriteLine(visitado.Last());
 
                 // Achou a saída?
                 if (lAtual - 1 == lSaida && cAtual - 1 == cSaida)
@@ -170,21 +165,105 @@ namespace Atividade
                     break;
                 }
 
+                // Direcionais convertidos da Lista para pontos dentro da matriz
+                // Cima
+                bool subir = matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] != "0";
+
+                // Esquerda
+                bool esquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? cAtual - 2 : 0] != "0";
+
+                // Direita
+                bool direita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] != "0";
+
+                // Baixo
+                bool descer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] != "0";
+
+                // Verificar se a posição destino já foi registrada com a mesma direção
                 //Pode subir? Se sim, o elemento já existe na lista?
-                bool podeSubir = matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
-                                      !resultado.Contains("C [" + (lAtual - 1 > 0 ? lAtual - 1 : 0) + ", " + (cAtual) + "]");
+                bool jaEsteveCima = resultado.Contains("C [" + (lAtual - 1 > 0 ? lAtual - 1 : 0) + ", " + (cAtual) + "]");
 
                 //Pode ir para esquerda? Se sim, o elemento já existe na lista?
-                bool podeEsquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? lAtual - 2 : 0] == "0" &&
-                                    !resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
+                bool jaEsteveEsquerda = resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
 
                 //Pode ir para direita? Se sim, o elemento já existe na lista?
-                bool podeDireita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] == "0" &&
-                                   !resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                bool jaEsteveDireita = resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
 
                 //Pode descer? Se sim, o elemento já existe na lista?
-                bool podeDescer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] == "0" &&
-                                  !resultado.Contains("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
+                bool jaEsteveBaixo = resultado.Contains("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
+
+                //Variáveis "foiVisitado" indicarão com "true" se a célula já foi registrada ou retornarão "false" se ela não tiver sido registrada.
+                bool foiVisitadoCima = visitado.Contains($"{(lAtual - 1 > 0 ? lAtual - 1 : 0)}{cAtual}");
+
+                bool foiVisitadoEsquerda = visitado.Contains($"{lAtual}{(cAtual - 1 > 0 ? cAtual - 1 : 0)}");
+
+                bool foiVisitadoDireita = visitado.Contains($"{lAtual}{cAtual + 1}");
+
+                bool foiVisitadoBaixo = visitado.Contains($"{lAtual + 1}{cAtual}");
+
+                if (esquerda && direita && descer)
+                    foiVisitadoCima = false;
+
+                if (subir && direita && descer)
+                    foiVisitadoEsquerda = false;
+
+                if (subir && esquerda && descer)
+                    foiVisitadoDireita = false;
+
+                if(subir && direita && esquerda)
+                    foiVisitadoBaixo = false;
+
+                //prioridade
+
+                bool prioridadeCima = (esquerda ^ foiVisitadoEsquerda) && (direita ^ foiVisitadoDireita) && (descer ^ foiVisitadoBaixo);
+
+                bool prioridadeEsquerda = (subir ^ foiVisitadoCima) && (direita ^ foiVisitadoDireita) && (descer ^ foiVisitadoBaixo);
+
+                bool prioridadeDireita = (subir ^ foiVisitadoCima) && (esquerda ^ foiVisitadoEsquerda) && (descer ^ foiVisitadoBaixo);
+
+                bool prioridadeBaixo = (subir ^ foiVisitadoCima) && (direita ^ foiVisitadoDireita) && (esquerda ^ foiVisitadoEsquerda);
+
+                //Lógica final para o if
+                //Cima
+                bool podeSubir = !subir && !jaEsteveCima;
+
+                //Esquerda
+                bool podeEsquerda = !esquerda && !jaEsteveEsquerda;
+
+                //Direita
+                bool podeDireita = !direita && !jaEsteveDireita;
+
+                //Baixo
+                bool podeDescer = !descer && !jaEsteveBaixo;
+
+                //filtro para evitar duplicidade de coordenadas desnecessárias.
+
+                if (prioridadeCima)
+                {
+                    podeEsquerda = false;
+                    podeDireita = false;
+                    podeDescer = false;
+                }
+
+                if (prioridadeEsquerda)
+                {
+                    podeSubir = false;
+                    podeDireita = false;
+                    podeDescer =false;
+                }
+
+                if (prioridadeDireita)
+                {
+                    podeSubir = false;
+                    podeEsquerda = false;
+                    podeDescer = false;
+                }
+
+                if(prioridadeBaixo)
+                {
+                    podeSubir = false;
+                    podeEsquerda = false;
+                    podeDireita = false;
+                }
 
                 // Condição só permite a entrada se além da condição do "podeSubir","podeEsquerda", "podeDireita" e "podeDescer" ser atendida,
                 // não pode ter registrado o mesmo ponto na mesma direção.
@@ -192,21 +271,25 @@ namespace Atividade
                 if (podeSubir)
                 {
                     resultado.Add("C [" + (lAtual - 1) + ", " + (cAtual) + "]");
+                    visitado.Add($"{lAtual - 1}{cAtual}");
                     contadorDeLoop = 0;
                 }
                 else if (podeEsquerda)
                 {
                     resultado.Add("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
+                    visitado.Add($"{lAtual}{cAtual - 1}");
                     contadorDeLoop = 0;
                 }
                 else if (podeDireita)
                 {
                     resultado.Add("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                    visitado.Add($"{lAtual}{cAtual + 1}");
                     contadorDeLoop = 0;
                 }
                 else if (podeDescer)
                 {
                     resultado.Add("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
+                    visitado.Add($"{lAtual + 1}{cAtual}");
                     contadorDeLoop = 0;
                 }
 
