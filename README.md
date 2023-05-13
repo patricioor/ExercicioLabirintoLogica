@@ -1,4 +1,4 @@
-# Exercicio de Lógica - Labirinto Binário
+# Exercício de Lógica - Labirinto Binário
 
 O código fornecido é uma implementação de um algoritmo de resolução de labirinto que percorre uma matriz e tenta encontrar a saída, 
 priorizando certas direções e não visitando células já visitadas. O algoritmo armazena o caminho percorrido em uma lista de strings chamada "resultado".
