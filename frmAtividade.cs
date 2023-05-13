@@ -161,42 +161,52 @@ namespace Atividade
                     break;
                 }
 
-                // Direcionais convertidos da Lista para pontos dentro da matriz
+                // Direcionais que convertem as coordenadas da lista "resultado", outrora acrescidos +1,+1 para adaptar ao modelo da matriz que não começa do índice 0,
+                // em pontos que sejam correspondendo na matriz.
+
                 // Cima
+                // Converter o resultado (-1,-1) para célula da matriz e adicionar (-1,0)
+                //(-1,-1) + ( -1, 0) = (-2, -1)
                 bool subir = matriz[lAtual - 2 > 0 ? lAtual - 2 : 0, cAtual - 1 > 0 ? cAtual - 1 : 0] != "0";
 
                 // Esquerda
+                // Converter o resultado (-1,-1) para célula da matriz e adicionar (0,-1).
+                //(-1,-1) + ( 0, -1) = (-1, -2)
                 bool esquerda = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual - 2 > 0 ? cAtual - 2 : 0] != "0";
 
                 // Direita
+                // Converter o resultado (-1,-1) para célula da matriz e adicionar (0,+1).
+                //(-1,-1) + ( 0, +1) = (-1, 0)
                 bool direita = matriz[lAtual - 1 > 0 ? lAtual - 1 : 0, cAtual] != "0";
 
                 // Baixo
+                // Converter o resultado (-1,-1) para célula da matriz e adicionar (+1,0).
+                // (-1, -1) + (+1, 0) = (0, -1)
                 bool descer = matriz[lAtual, cAtual - 1 > 0 ? cAtual - 1 : 0] != "0";
 
                 // Verificar se a posição destino já foi registrada com a mesma direção
-                //Pode subir? Se sim, o elemento já existe na lista?
+                // Célula já registrada com o direcional "C"(subir)?
                 bool jaEsteveCima = resultado.Contains("C [" + (lAtual - 1 > 0 ? lAtual - 1 : 0) + ", " + (cAtual) + "]");
 
-                //Pode ir para esquerda? Se sim, o elemento já existe na lista?
+                // Célula já registrada com o direcional "E"(Esquerda)?
                 bool jaEsteveEsquerda = resultado.Contains("E [" + (lAtual) + ", " + (cAtual - 1) + "]");
 
-                //Pode ir para direita? Se sim, o elemento já existe na lista?
-                bool jaEsteveDireita = resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1) + "]");
+                // Célula já registrada com o direcional "D"(Direita)?
+                bool jaEsteveDireita = resultado.Contains("D [" + (lAtual) + ", " + (cAtual + 1 > extremidadeColuna ? extremidadeColuna: cAtual + 1) + "]");
 
-                //Pode descer? Se sim, o elemento já existe na lista?
-                bool jaEsteveBaixo = resultado.Contains("B [" + (lAtual + 1) + ", " + (cAtual) + "]");
+                // Célula já registrada com o direcional "B"(Descer)?
+                bool jaEsteveBaixo = resultado.Contains("B [" + (lAtual + 1 > extremidadeLinha ? extremidadeLinha: lAtual +1) + ", " + (cAtual) + "]");
 
-                //Variáveis "foiVisitado" indicarão com "true" se a célula já foi registrada ou retornarão "false" se ela não tiver sido registrada.
+                //Variável "foiVisitado" indicará com "true" se a célula já foi registrada independente do direcional ou retornará "false" caso contrário.
                 bool foiVisitadoCima = visitado.Contains($"{(lAtual - 1 > 0 ? lAtual - 1 : 0)}{cAtual}");
 
                 bool foiVisitadoEsquerda = visitado.Contains($"{lAtual}{(cAtual - 1 > 0 ? cAtual - 1 : 0)}");
 
-                bool foiVisitadoDireita = visitado.Contains($"{lAtual}{cAtual + 1}");
+                bool foiVisitadoDireita = visitado.Contains($"{lAtual}{(cAtual + 1 > extremidadeColuna ? extremidadeColuna: cAtual + 1)}");
 
-                bool foiVisitadoBaixo = visitado.Contains($"{lAtual + 1}{cAtual}");
+                bool foiVisitadoBaixo = visitado.Contains($"{(lAtual + 1 > extremidadeLinha ? extremidadeLinha: lAtual +1)}{cAtual}");
 
-                //Liberação da volta a uma célula já visitada caso não haja saída
+                //Converte a variável "foiVisitado" caso 3 das 4 possibilidades de movimentação sejam blocos inacessíveis
 
                 if (esquerda && direita && descer)
                     foiVisitadoCima = false;
@@ -210,7 +220,7 @@ namespace Atividade
                 if(subir && direita && esquerda)
                     foiVisitadoBaixo = false;
 
-                //prioridade
+                // Variável "prioridade" vai verificar se a célula é propria para registro ou se ela já foi visitada.
 
                 bool prioridadeCima = (esquerda ^ foiVisitadoEsquerda) && (direita ^ foiVisitadoDireita) && (descer ^ foiVisitadoBaixo);
 
@@ -219,8 +229,6 @@ namespace Atividade
                 bool prioridadeDireita = (subir ^ foiVisitadoCima) && (esquerda ^ foiVisitadoEsquerda) && (descer ^ foiVisitadoBaixo);
 
                 bool prioridadeBaixo = (subir ^ foiVisitadoCima) && (direita ^ foiVisitadoDireita) && (esquerda ^ foiVisitadoEsquerda);
-
-                
 
                 //Lógica final para o if
                 bool podeSubir = !subir && !jaEsteveCima;
@@ -231,13 +239,13 @@ namespace Atividade
 
                 bool podeDescer = !descer && !jaEsteveBaixo;
 
-                //confirmação parede
+                //Confirmar que o caminho que será priorizado não é uma parede.
                 if (prioridadeCima && !podeSubir) prioridadeCima = false;
                 if (prioridadeEsquerda && !podeEsquerda) prioridadeEsquerda = false;
                 if (prioridadeDireita && !podeDireita) prioridadeDireita = false;
                 if (prioridadeBaixo && !podeDescer) prioridadeBaixo = false;
 
-                //filtro para evitar duplicidade de coordenadas desnecessárias.
+                //Filtro para priorizar células que levarão a novas rotas
 
                 if (prioridadeCima)
                 {
